@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="setgame.js"></script>
+    <style>
+        /* 1. Centred board with max-width and 3 columns */
+        #board {
+            max-width: 300px;
+            /* adjust as you like */
+            margin: 0 auto;
+            /* center on page */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            /* space between cards */
+            padding: 16px;
+        }
+
+        /* 2. Each card is a canvas that fills its grid cell
+          and maintains a 2:3 aspect ratio */
+        .card {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card.selected {
+            border-color: orange;
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.6);
+        }
+
+        .card canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        #found {
+            margin: 0 auto;
+            text-align: center;
+            max-width: 200px;
+        }
+
+        #found div {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+    </style>
+    <title>Set-Game Board</title>
+</head>
+
+<body>
+    <div id="board"></div>
+    <div id="found">
+        <h3 id="found-count">No sets found</h3>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const found = document.getElementById('found');
+
+        const cards = randomTwelveGame();
+
+        loadGame(board, found, cards);
+    </script>
+</body>
+
+</html>

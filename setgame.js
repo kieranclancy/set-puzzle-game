@@ -235,6 +235,10 @@ function onCardClick(wrapper, found) {
                 document.getElementById('found-count').textContent =
                     foundSets.length === 1 ? 'Found 1 set' :
                     `Found ${foundSets.length} sets`;
+
+                if (foundSets.length === 6) {
+                    alert('All sets found!');
+                }
             }
         }
 

@@ -37,11 +37,32 @@ const completions = Array(N).fill(0).map((_, i) =>
 
 const allCards = Array(N).fill(0).map((_, i) => i);
 
+function todayAsInt() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(now.getDate()).padStart(2, '0');
+
+    return parseInt(`${year}${month}${day}`, 10);
+}
+
+const randomGenerator = new Random(Random.engines.mt19937().seed(todayAsInt()));
+
+// Choose a number between 0 and n-1
+function rand(n) {
+    if (window.location.search === '?practice') {
+        return Math.floor(Math.random() * n);
+    } else {
+        return randomGenerator.integer(0, n - 1);
+    }
+}
+
 function pickRandom(s) {
     if (s.length === 0) {
         throw new Error('Cannot pick from empty array');
     }
-    const i = Math.floor(Math.random() * s.length);
+    const i = rand(s.length);
     const result = s[i];
     s.splice(i, 1);
     return result;

@@ -179,6 +179,7 @@ function drawSetCard(canvas, card) {
     }
 }
 
+let startTime = undefined;
 const selectedWrappers = [];
 const foundSets = [];
 
@@ -237,7 +238,10 @@ function onCardClick(wrapper, found) {
                     `Found ${foundSets.length} sets`;
 
                 if (foundSets.length === 6) {
-                    alert('All sets found!');
+                    const duration = Math.round((Date.now() - startTime) / 1000);
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = duration - 60 * minutes;
+                    alert(`All sets found in ${minutes}m${seconds}s!`);
                 }
             }
         }
@@ -257,6 +261,8 @@ function onCardClick(wrapper, found) {
 function loadGame(board, found, cards) {
     board.innerHTML = '';         // clear any old cards
     selectedWrappers.length = 0;  // reset selection
+
+    startTime = Date.now();
 
     cards.forEach(spec => {
         const wrapper = document.createElement('div');

@@ -111,8 +111,15 @@ const shapePaths = [
     'M25,0 L75,0 A25,25 0 0 1 75,50 L25,50 A25,25 0 0 1 25,0 Z',
     // squiggle
     `M 17.1283,3.7498035
-C 30.090699,0.17911898 39.724489,4.9782516 48.102816,7.7379073 56.481143,10.497563 69.327048,13.061292 79.61011,6.5244546 89.893173,-0.01238256 90.043588,-0.66457041 93.909469,0.42800516 101.25245,2.503288 105.94596,32.002207 83.704341,41.151016 75.021548,44.722577 61.032928,46.056944 51.040935,42.383011 41.048941,38.709077 34.18853,35.900849 24.97381,41.373385 15.75909,46.845918 11.435618,54.270589 5.2727647,46.926235 -3.4115138,36.577068 -2.6093754,9.1868235 17.1283,3.7498035
-Z`,
+     C 30.090699,0.17911898 39.724489,4.9782516 48.102816,7.7379073
+     56.481143,10.497563 69.327048,13.061292 79.61011,6.5244546
+     89.893173,-0.01238256 90.043588,-0.66457041 93.909469,0.42800516
+     101.25245,2.503288 105.94596,32.002207 83.704341,41.151016
+     75.021548,44.722577 61.032928,46.056944 51.040935,42.383011
+     41.048941,38.709077 34.18853,35.900849 24.97381,41.373385
+     15.75909,46.845918 11.435618,54.270589 5.2727647,46.926235
+     -3.4115138,36.577068 -2.6093754,9.1868235 17.1283,3.7498035
+     Z`,
 ];
 
 const colours = ['red', 'green', 'purple'];
@@ -203,13 +210,38 @@ function drawSetCard(canvas, card) {
 let startTime = undefined;
 const selectedWrappers = [];
 const foundSets = [];
+let setClearTimeout = 0;
+
+/**
+ * Adds an alert text for some amount of time.
+ * @param {string} text
+ * @param {number} timeout_ms if zero, no timeout.
+ */
+function set_alert(text, timeout_ms) {
+    const alert_element = document.getElementById('alert');
+    alert_element.innerText = text;
+    if (setClearTimeout > 0) {
+        clearTimeout(setClearTimeout);
+        setClearTimeout = 0;
+    }
+    if (timeout_ms > 0) {
+        setClearTimeout = setTimeout(() => {
+            alert_element.innerText = '';
+        }, timeout_ms);
+    }
+}
 
 /**
  * Handles a click on one card wrapper.
  * @param {HTMLDivElement} wrapper
  * @param {HTMLDivElement} found
+ * @param {number} setCount
  */
-function onCardClick(wrapper, found) {
+function onCardClick(wrapper, found, setCount) {
+    if (foundSets.length == setCount) {
+        return;
+    }
+
     // toggle off
     if (wrapper.classList.contains('selected')) {
         wrapper.classList.remove('selected');
@@ -232,16 +264,17 @@ function onCardClick(wrapper, found) {
         const isSet = countSets(specs) === 1;
 
         if (!isSet) {
-            alert('❌ Not a Set');
+            set_alert('❌ Not a Set', 800);
         } else {
             const specSet = new Set(specs);
 
             if (foundSets.some(s => specs.every(card => s.has(card)))) {
-                alert('Already found!');
+                set_alert('❗ Already Found', 800);
             } else {
                 foundSets.push(specSet);
                 // Create a div with the found set and display it.
                 const newFoundDiv = document.createElement('div');
+                newFoundDiv.className = 'found-set';
                 specs.forEach(card => {
                     const cardWrapper = document.createElement('div');
                     cardWrapper.className = 'card';
@@ -258,11 +291,13 @@ function onCardClick(wrapper, found) {
                     foundSets.length === 1 ? 'Found 1 set' :
                     `Found ${foundSets.length} sets`;
 
-                if (foundSets.length === 6) {
+                if (foundSets.length === setCount) {
                     const duration = Math.round((Date.now() - startTime) / 1000);
                     const minutes = Math.floor(duration / 60);
                     const seconds = duration - 60 * minutes;
-                    alert(`All sets found in ${minutes}m${seconds}s!`);
+                    set_alert(`🎉 All sets found in ${minutes}m${seconds}s!`, 0);
+                } else {
+                    set_alert('✅ Valid Set', 800);
                 }
             }
         }
@@ -285,11 +320,13 @@ function loadGame(board, found, cards) {
 
     startTime = Date.now();
 
+    const setCount = countSets(cards);
+
     cards.forEach(spec => {
         const wrapper = document.createElement('div');
         wrapper.className = 'card';
         wrapper.dataset.card = spec;       // store which card it is
-        wrapper.addEventListener('click', () => onCardClick(wrapper, found));
+        wrapper.addEventListener('click', () => onCardClick(wrapper, found, setCount));
 
         const cvs = document.createElement('canvas');
         cvs.width = 200;

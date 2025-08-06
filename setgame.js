@@ -265,12 +265,28 @@ function onCardClick(wrapper, found, setCount) {
 
         if (!isSet) {
             set_alert('❌ Not a Set', 800);
+            const wrappers = [...selectedWrappers];
+            selectedWrappers.forEach(w => w.classList.add('incorrect'));
+            setTimeout(() => {
+                wrappers.forEach(w => w.classList.remove('incorrect'));
+            }, 800);
         } else {
             const specSet = new Set(specs);
 
             if (foundSets.some(s => specs.every(card => s.has(card)))) {
                 set_alert('❗ Already Found', 800);
+                const wrappers = [...selectedWrappers];
+                selectedWrappers.forEach(w => w.classList.add('incorrect'));
+                setTimeout(() => {
+                    wrappers.forEach(w => w.classList.remove('incorrect'));
+                }, 800);
             } else {
+                const wrappers = [...selectedWrappers];
+                selectedWrappers.forEach(w => w.classList.add('correct'));
+                setTimeout(() => {
+                    wrappers.forEach(w => w.classList.remove('correct'));
+                }, 800);
+
                 foundSets.push(specSet);
                 // Create a div with the found set and display it.
                 const newFoundDiv = document.createElement('div');
